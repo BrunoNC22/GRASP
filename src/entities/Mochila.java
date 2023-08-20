@@ -38,7 +38,11 @@ public class Mochila {
 		if (this.pesoAtual + item.getPeso() > this.capacidade) {
 			throw new IllegalArgumentException("Capacidade excedida!!");
 		}
+		if (item.isAlocado()) {
+			throw new RuntimeException("O item ja está alocado!!");
+		}
 		this.itens.add(item);
+		item.setAlocado(true);
 		this.pesoAtual += item.getPeso();
 	}
 	

@@ -21,7 +21,7 @@ public class Main {
 		Item teste2 = new Item(3, 9);
 		Item teste3 = new Item(3, 7);
 		
-		Item[] itens = {banana, beringela, abacaxi, queijo, teste1, teste2, teste3, banana};
+		Item[] itens = {banana, beringela, abacaxi, queijo, teste1, teste2, teste3};
 		
 		for (Item tempItem : itens) {
 			mochila.addItem(tempItem);
