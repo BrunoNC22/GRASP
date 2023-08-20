@@ -2,11 +2,11 @@ package entities;
 
 public class Item {
 	
-	int peso;
+	private int peso;
 	
-	float valor;
+	private  float valor;
 	
-	boolean alocado;
+	private  boolean alocado;
 
 	public Item(int peso, float valor) {
 		this.peso = peso;

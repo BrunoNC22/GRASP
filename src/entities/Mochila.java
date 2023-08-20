@@ -6,17 +6,21 @@ import java.util.Set;
 public class Mochila {
 	private int capacidade;
 	
+	private float valorTotal;
+	
 	private float pesoAtual;
 	
 	private Set<Item> itens;
 
 	public Mochila(int capacidade) {
+		this.valorTotal = 0;
 		this.pesoAtual = 0;
 		this.capacidade = capacidade;
 		this.itens = new HashSet<>();
 	}
 	
 	public Mochila() {
+		this.valorTotal = 0;
 		this.pesoAtual = 0;
 		this.itens = new HashSet<>();
 		
@@ -43,10 +47,8 @@ public class Mochila {
 		}
 		this.itens.add(item);
 		item.setAlocado(true);
+		this.valorTotal += item.getValor();
 		this.pesoAtual += item.getPeso();
 	}
-	
-	
-	
 	
 }
