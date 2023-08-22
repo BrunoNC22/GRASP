@@ -1,12 +1,11 @@
 package utilities;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 import entities.Item;
 import entities.Mochila;
@@ -25,46 +24,30 @@ public class ArchiveReader {
 		File arquivo = new File(this.caminhoDoArquivo);
 
         try {
-            FileReader fileReader = new FileReader(arquivo);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-
-            String linha1 = bufferedReader.readLine();
-            
-            mochila.setCapacidade(Integer.parseInt(linha1));
-
-            bufferedReader.close();
+        	Scanner scanner = new Scanner(arquivo);
+        	mochila.setCapacidade(Integer.parseInt(scanner.nextLine()));
+        	scanner.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        
         return mochila;
 	}
 	
 	public List<Item> crateItens() throws FileNotFoundException {
 		List<Item> itens = new ArrayList<Item>();
-	
-		
 		File arquivo = new File(this.caminhoDoArquivo);
-
         try {
-            FileReader fileReader = new FileReader(arquivo);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-
-            String linha = bufferedReader.readLine();
-            
-            int qtdItens = Integer.parseInt(bufferedReader.readLine());
- 
-            String[] linhas;
-            
-            for (int cont = 0; cont < qtdItens; cont++) {
-            	linhas = bufferedReader.readLine().split(" ");
-            	int peso = Integer.parseInt(linhas[0]);
-            	float valor = Float.parseFloat(linhas[1]);
+            Scanner scanner = new Scanner(arquivo);
+            scanner.nextLine();
+            scanner.nextLine();
+            while (scanner.hasNextLine()) {
+            	String[] linha = scanner.nextLine().split(" ");
+            	float valor = Float.parseFloat(linha[1]);
+            	int peso = Integer.parseInt(linha[0]);
             	Item item = new Item(peso, valor);
-            	itens.add(item);
+            	itens.add(item);	
             }
-
-            bufferedReader.close();
+            scanner.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

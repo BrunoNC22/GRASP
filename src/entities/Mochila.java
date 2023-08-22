@@ -37,6 +37,10 @@ public class Mochila {
 	public Set<Item> getItens() {
 		return itens;
 	}
+	
+	public float getValorTotal() {
+		return this.valorTotal;
+	}
 
 	public void addItem(Item item) {
 		if (this.pesoAtual + item.getPeso() > this.capacidade) {

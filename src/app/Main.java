@@ -1,6 +1,9 @@
 package app;
 
 import java.io.FileNotFoundException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 import entities.Item;
@@ -10,41 +13,101 @@ import utilities.ArchiveReader;
 public class Main {
 	
 	public static void main(String[] args) throws FileNotFoundException {
-		Mochila mochila = new Mochila(50);
+		Path path = Paths.get(System.getProperty("user.dir"), "mock.txt");
 		
-		Item banana = new Item(3, 7);
-		Item beringela = new Item(5, 9);
-		Item abacaxi = new Item(2, 6);
-		Item queijo = new Item(1, 7);
+		ArchiveReader ar = new ArchiveReader(path.toString());
 		
-		Item teste1 = new Item(8, 7);
-		Item teste2 = new Item(3, 9);
-		Item teste3 = new Item(3, 7);
+		List<Item> items = ar.crateItens();
 		
-		Item[] itens = {banana, beringela, abacaxi, queijo, teste1, teste2, teste3};
-		
-		for (Item tempItem : itens) {
-			mochila.addItem(tempItem);
+		for (Item item : items) {
+			System.out.println("valor: " + item.getValor() + " peso: " + item.getPeso());
 		}
+
 		
-		for (Item tempItem : mochila.getItens()) {
-			System.out.println("peso: " + Integer.toString(tempItem.getPeso()) + " valor: " + Float.toString(tempItem.getValor()));
-		}
+		Mochila mochila = ar.createMochila();
 		
-		System.out.println("------------------");
-		ArchiveReader ar = new ArchiveReader("C:\\Users\\the_b\\OneDrive\\Documentos\\Meu notebook\\PO\\T2\\PMB.txt");
 		
-		Mochila mochilinha = ar.createMochila();
-		
-		List<Item> itensList = ar.crateItens();
-		
-		for (Item tempItem : itensList) {
-			mochilinha.addItem(tempItem);
-		}
-		
-		for (Item tempItem : mochilinha.getItens()) {
-			System.out.println("peso: " + Integer.toString(tempItem.getPeso()) + " valor: " + Float.toString(tempItem.getValor()));
-		}
+        int iterations = 10000;
+
+        List<Item> bestSolution = graspMochila(items, mochila.getCapacidade(), iterations);
+
+        int totalValue = 0;
+        int totalWeight = 0;
+        for (Item item : bestSolution) {
+            totalValue += item.getValor();
+            totalWeight += item.getPeso();
+            System.out.println("Item - Value: " + item.getValor() + ", Weight: " + item.getPeso());
+        }
+        System.out.println("Valor total: " + totalValue);
+        System.out.println("Peso total: " + totalWeight);
+    }
+
+    public static List<Item> graspMochila(List<Item> items, int maxWeight, int iterations) {
+        List<Item> bestSolution = new ArrayList<>();
+        int bestValue = 0;
+
+        for (int i = 0; i < iterations; i++) {
+            List<Item> solution = greedyRandomizedConstruction(items, maxWeight);
+            int solutionValue = calculateTotalValue(solution);
+
+            if (solutionValue > bestValue && calculateTotalWeight(solution) <= maxWeight) {
+                bestSolution = new ArrayList<>(solution);
+                bestValue = solutionValue;
+            }
+        }
+
+        return bestSolution;
+    }
+
+    public static List<Item> greedyRandomizedConstruction(List<Item> items, int maxWeight) {
+        List<Item> solution = new ArrayList<>();
+        List<Item> remainingItems = new ArrayList<>(items);
+
+        while (!remainingItems.isEmpty()) {
+            double alpha = 0.5; // Adjustable parameter
+            double randomValue = Math.random();
+
+            List<Item> candidateList = new ArrayList<>();
+            for (Item item : remainingItems) {
+                if ((double) item.getValor() / item.getPeso() >= alpha) {
+                    candidateList.add(item);
+                }
+            }
+
+            if (candidateList.isEmpty()) {
+                break;
+            }
+
+            int randomIndex = (int) (Math.random() * candidateList.size());
+            Item selected = candidateList.get(randomIndex);
+            
+            if (calculateTotalWeight(solution) + selected.getPeso() > maxWeight) {
+            	break;
+            }
+            
+            solution.add(selected);
+            
+            remainingItems.remove(selected);
+        }
+        
+        return solution;
+    }
+
+    public static int calculateTotalValue(List<Item> items) {
+        int totalValue = 0;
+        for (Item item : items) {
+            totalValue += item.getValor();
+        }
+        return totalValue;
+    }
+
+    public static int calculateTotalWeight(List<Item> items) {
+        int totalWeight = 0;
+        for (Item item : items) {
+            totalWeight += item.getPeso();
+        }
+        return totalWeight;
+    
 	}
 	
 
