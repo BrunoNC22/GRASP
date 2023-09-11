@@ -1,6 +1,8 @@
 package entities;
 
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class Mochila {
@@ -35,7 +37,7 @@ public class Mochila {
 	}
 
 	public Set<Item> getItens() {
-		return itens;
+		return Collections.unmodifiableSet(this.itens);
 	}
 	
 	public float getValorTotal() {
@@ -44,7 +46,7 @@ public class Mochila {
 
 	public void addItem(Item item) {
 		if (this.pesoAtual + item.getPeso() > this.capacidade) {
-			throw new IllegalArgumentException("Capacidade excedida!!");
+			throw new RuntimeException("Capacidade excedida!!");
 		}
 		if (item.isAlocado()) {
 			throw new RuntimeException("O item ja está alocado!!");
@@ -55,4 +57,13 @@ public class Mochila {
 		this.pesoAtual += item.getPeso();
 	}
 	
+	public void setItens(List<Item> itens) {
+		for (Item item : itens) {
+			this.addItem(item);
+		}
+	}
+	
+	public float getPesoAtual() {
+		return this.pesoAtual;
+	}
 }

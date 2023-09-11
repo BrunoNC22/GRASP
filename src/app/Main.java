@@ -13,102 +13,75 @@ import utilities.ArchiveReader;
 public class Main {
 	
 	public static void main(String[] args) throws FileNotFoundException {
-		Path path = Paths.get(System.getProperty("user.dir"), "mock.txt");
-		
+		String nomeDoArquivo = "mock.txt";
+		Path path = Paths.get(System.getProperty("user.dir"), nomeDoArquivo);
 		ArchiveReader ar = new ArchiveReader(path.toString());
-		
 		List<Item> items = ar.crateItens();
-		
-		for (Item item : items) {
-			System.out.println("valor: " + item.getValor() + " peso: " + item.getPeso());
-		}
-
-		
 		Mochila mochila = ar.createMochila();
-		
-		
-        int iterations = 10000;
-
-        List<Item> bestSolution = graspMochila(items, mochila.getCapacidade(), iterations);
-
-        int totalValue = 0;
-        int totalWeight = 0;
-        for (Item item : bestSolution) {
-            totalValue += item.getValor();
-            totalWeight += item.getPeso();
-            System.out.println("Item - Value: " + item.getValor() + ", Weight: " + item.getPeso());
+        int iteracoes = 20;
+        mochila.setItens(graspMochila(items, mochila.getCapacidade(), iteracoes));
+        for (Item item : mochila.getItens()) {
+            System.out.println("Item - Valor: " + item.getValor() + ", Peso: " + item.getPeso());
         }
-        System.out.println("Valor total: " + totalValue);
-        System.out.println("Peso total: " + totalWeight);
+        System.out.println("Valor total: " + mochila.getValorTotal());
+        System.out.println("Peso total: " + mochila.getPesoAtual());
     }
 
-    public static List<Item> graspMochila(List<Item> items, int maxWeight, int iterations) {
-        List<Item> bestSolution = new ArrayList<>();
-        int bestValue = 0;
+    public static List<Item> graspMochila(List<Item> items, int pesoMaximo, int iteracoes) {
+        List<Item> melhorSolucao = new ArrayList<>();
+        int melhorValor = 0;
 
-        for (int i = 0; i < iterations; i++) {
-            List<Item> solution = greedyRandomizedConstruction(items, maxWeight);
-            int solutionValue = calculateTotalValue(solution);
+        for (int i = 0; i < iteracoes; i++) {
+            List<Item> solucao = construcaoAleatoriaGulosa(items, pesoMaximo);
+            int valorDaSolucao = calcularValorTotal(solucao);
+            int pesoDaSolucao = calcularPesoTotal(solucao);
 
-            if (solutionValue > bestValue && calculateTotalWeight(solution) <= maxWeight) {
-                bestSolution = new ArrayList<>(solution);
-                bestValue = solutionValue;
+            if (valorDaSolucao > melhorValor && pesoDaSolucao <= pesoMaximo) {
+                melhorSolucao = new ArrayList<>(solucao);
+                melhorValor = valorDaSolucao;
             }
         }
-
-        return bestSolution;
+        return melhorSolucao;
     }
 
-    public static List<Item> greedyRandomizedConstruction(List<Item> items, int maxWeight) {
-        List<Item> solution = new ArrayList<>();
-        List<Item> remainingItems = new ArrayList<>(items);
-
-        while (!remainingItems.isEmpty()) {
-            double alpha = 0.5; // Adjustable parameter
-            double randomValue = Math.random();
-
-            List<Item> candidateList = new ArrayList<>();
-            for (Item item : remainingItems) {
+    public static List<Item> construcaoAleatoriaGulosa(List<Item> items, int maxWeight) {
+    	List<Item> solucao = new ArrayList<>();
+        List<Item> itensRestates = new ArrayList<>(items);
+        while (!itensRestates.isEmpty()) {
+            double alpha = 0.5; // Parametro ajustavel
+            List<Item> listaCandidata = new ArrayList<>();
+            for (Item item : itensRestates) {
                 if ((double) item.getValor() / item.getPeso() >= alpha) {
-                    candidateList.add(item);
+                    listaCandidata.add(item);
                 }
             }
-
-            if (candidateList.isEmpty()) {
+            if (listaCandidata.isEmpty()) {
                 break;
             }
-
-            int randomIndex = (int) (Math.random() * candidateList.size());
-            Item selected = candidateList.get(randomIndex);
+            int indexAleatorio = (int) (Math.random() * listaCandidata.size());
+            Item itemAleatoriamenteSelecionado = listaCandidata.get(indexAleatorio);
             
-            if (calculateTotalWeight(solution) + selected.getPeso() > maxWeight) {
-            	break;
+            if (!(calcularPesoTotal(solucao) + itemAleatoriamenteSelecionado.getPeso() > maxWeight)) {
+            	solucao.add(itemAleatoriamenteSelecionado);
             }
-            
-            solution.add(selected);
-            
-            remainingItems.remove(selected);
+            itensRestates.remove(itemAleatoriamenteSelecionado);
         }
-        
-        return solution;
+        return solucao;
     }
 
-    public static int calculateTotalValue(List<Item> items) {
-        int totalValue = 0;
+    public static int calcularValorTotal(List<Item> items) {
+        int valorTotal = 0;
         for (Item item : items) {
-            totalValue += item.getValor();
+            valorTotal += item.getValor();
         }
-        return totalValue;
+        return valorTotal;
     }
 
-    public static int calculateTotalWeight(List<Item> items) {
-        int totalWeight = 0;
+    public static int calcularPesoTotal(List<Item> items) {
+        int pesoTotal = 0;
         for (Item item : items) {
-            totalWeight += item.getPeso();
+            pesoTotal += item.getPeso();
         }
-        return totalWeight;
-    
+        return pesoTotal;
 	}
-	
-
 }
